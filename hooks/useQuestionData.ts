@@ -1,6 +1,6 @@
 import { useReducer, useState, useEffect, useRef, useCallback } from "react";
-import { getChapterQuestions, getQuestion } from "@/services/questions";
-import { ChapterQuestionItem, QuestionItem } from "@/lib/types";
+import { getChapterDetails, getQuestion } from "@/services/questions";
+import { QuestionItem } from "@/lib/types";
 import { questionReducer, QuestionState } from "@/lib/reducer";
 import { useDebounce } from "@/lib/debounce";
 
@@ -11,7 +11,7 @@ interface UseQuestionDataProps {
 
 interface UseQuestionDataReturn {
   error: string | null;
-  questionList: ChapterQuestionItem[];
+  questionList: string[];
   questionsData: { [id: string]: QuestionItem };
   loadingQuestion: boolean;
   currentIndex: number;
@@ -28,7 +28,7 @@ export function useQuestionData({
 }: UseQuestionDataProps): UseQuestionDataReturn {
   const debouncedQuestionId = useDebounce(questionId, 200);
   const [error, setError] = useState<string | null>(null);
-  const [questionList, setQuestionList] = useState<ChapterQuestionItem[]>([]);
+  const [questionList, setQuestionList] = useState<string[]>([]);
   const [questionsData, setQuestionsData] = useState<{
     [id: string]: QuestionItem;
   }>({});
@@ -46,19 +46,24 @@ export function useQuestionData({
     async (index: number) => {
       const qItem = questionList[index];
       if (!qItem) return;
-      if (questionsData[qItem.id] || loadingRequests.current[qItem.id]) return;
-      loadingRequests.current[qItem.id] = true;
+      if (loadingRequests.current[qItem]) return;
+
+      loadingRequests.current[qItem] = true;
       try {
-        const detailed = await getQuestion(qItem.id);
-        setQuestionsData((prev) => ({ ...prev, [detailed.id]: detailed }));
+        const detailed = await getQuestion(qItem);
+        setQuestionsData((prev) => {
+          // Only update if not already loaded
+          if (prev[detailed.id]) return prev;
+          return { ...prev, [detailed.id]: detailed };
+        });
       } catch (err) {
         console.error("Error loading question detail:", err);
         setError("Error loading question");
       } finally {
-        loadingRequests.current[qItem.id] = false;
+        loadingRequests.current[qItem] = false;
       }
     },
-    [questionList, questionsData]
+    [questionList]
   );
 
   // Initial data fetching
@@ -69,7 +74,7 @@ export function useQuestionData({
       try {
         const [currentDetail, chapterQs] = await Promise.all([
           getQuestion(debouncedQuestionId),
-          getChapterQuestions(chapter, 0, 50),
+          getChapterDetails(chapter),
         ]);
         if (!isMounted) return;
         setQuestionsData((prev) => ({
@@ -77,7 +82,7 @@ export function useQuestionData({
           [currentDetail.id]: currentDetail,
         }));
         setQuestionList(chapterQs);
-        const idx = chapterQs.findIndex((q) => q.id === currentDetail.id);
+        const idx = chapterQs.findIndex((q) => q === currentDetail.id);
         const newIndex = idx >= 0 ? idx : 0;
         setCurrentIndex(newIndex);
         dispatch({
@@ -127,43 +132,32 @@ export function useQuestionData({
     });
   };
 
-  // Preload adjacent questions
   useEffect(() => {
     if (!questionList.length) return;
-    const preloadIndices = [currentIndex - 2, currentIndex + 2];
-    preloadIndices.forEach((i) => {
-      if (i >= 0 && i < questionList.length) {
-        const qId = questionList[i].id;
-        if (!questionsData[qId] && !loadingRequests.current[qId]) {
-          loadQuestionDetail(i);
-        }
-      }
-    });
-  }, [currentIndex, questionList, questionsData, loadQuestionDetail]);
 
-  // Limit detailed questions to a window of 25 items
-  useEffect(() => {
-    if (!questionList.length) return;
-    const windowSize = 25;
-    const halfWindow = Math.floor(windowSize / 2);
-    let start = currentIndex - halfWindow;
-    let end = currentIndex + halfWindow;
-    if (start < 0) {
-      end = Math.min(end - start, questionList.length - 1);
-      start = 0;
-    } else if (end > questionList.length - 1) {
-      start = Math.max(0, start - (end - (questionList.length - 1)));
-      end = questionList.length - 1;
+    const preloadStart = Math.max(0, currentIndex - 3);
+    const preloadEnd = Math.min(questionList.length - 1, currentIndex + 5);
+
+    for (let i = preloadStart; i <= preloadEnd; i++) {
+      const qId = questionList[i];
+      if (!questionsData[qId] && !loadingRequests.current[qId]) {
+        loadQuestionDetail(i);
+      }
     }
+
+    // Only update questionsData if necessary
     setQuestionsData((prev) => {
       const newData: { [id: string]: QuestionItem } = {};
+      const start = Math.max(0, currentIndex - 25);
+      const end = Math.min(questionList.length - 1, currentIndex + 25);
+
       for (let i = start; i <= end; i++) {
-        const qId = questionList[i].id;
+        const qId = questionList[i];
         if (prev[qId]) newData[qId] = prev[qId];
       }
       return newData;
     });
-  }, [currentIndex, questionList]);
+  }, [currentIndex, questionList, loadQuestionDetail]); // Removed questionsData here
 
   return {
     error,

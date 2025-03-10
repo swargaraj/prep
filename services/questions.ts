@@ -3,6 +3,17 @@
 import client from "@/lib/client";
 import { ChapterQuestionItem, QuestionItem } from "@/lib/types";
 
+export const getChapterDetails = async (
+  id: string,
+  syllabusCategory: string = "asPerSyllabus"
+): Promise<string[]> => {
+  const response = await client.get(
+    `/v3/cpyqb/chapters/${id}/details/dynamic?syllabusCategory=${syllabusCategory}`
+  );
+
+  return response.data.data.questions.slice().reverse();
+};
+
 export const getChapterQuestions = async (
   id: string,
   offset: number,
@@ -44,9 +55,4 @@ export const getQuestion = async (id: string) => {
   };
 
   return questionData;
-};
-
-export const getQuestionsByIds = async (ids: string[]) => {
-  const questions = await Promise.all(ids.map((id) => getQuestion(id)));
-  return questions;
 };

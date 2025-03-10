@@ -32,9 +32,9 @@ export default function QuestionContainer({
   } = useQuestionData({ chapter, questionId: currentQuestionId });
 
   const loadedQuestions = questionList
-    .map((q) => questionsData[q.id])
+    .map((q) => questionsData[q])
     .filter((q): q is any => !!q);
-  const currentDetailedQuestion = questionsData[questionList[currentIndex]?.id];
+  const currentDetailedQuestion = questionsData[questionList[currentIndex]];
 
   if (error) {
     return <div className="text-red-400 text-center">{error}</div>;
@@ -51,7 +51,7 @@ export default function QuestionContainer({
     <div className="w-[90%] md:w-[70%] mx-auto">
       <QuestionHeader
         title={currentDetailedQuestion.previousYearPapers[0].title}
-        currentQuestionNumber={questionState.currentQuestionIndex + 1}
+        currentQuestionNumber={currentIndex + 1}
         totalQuestions={questionList.length}
       />
       <QuestionQuestion questionText={currentDetailedQuestion.title} />
@@ -59,7 +59,7 @@ export default function QuestionContainer({
         currentDetailedQuestion={currentDetailedQuestion}
         questionState={questionState}
         dispatch={dispatch}
-        currentQuestionIndex={questionState.currentQuestionIndex}
+        currentQuestionIndex={currentIndex}
         handleSelectOption={handleSelectOption}
         questionsData={questionsData}
         questionList={questionList}

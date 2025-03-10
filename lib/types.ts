@@ -1,10 +1,7 @@
 export type ExamItem = {
   title: string;
   examId: string;
-  icon: {
-    light: string;
-    dark: string;
-  };
+  tagline: string;
 };
 
 export interface ExamSubjectItem {

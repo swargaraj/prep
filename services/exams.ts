@@ -1,18 +1,23 @@
+"use server";
+
 import client from "@/lib/client";
 import { ExamItem, ExamSubjectItem } from "@/lib/types";
 
 export const getExams = async () => {
-  const response = await client.get("/v3/dashboard/platform/web");
+  const response = await client.get("/v1/cpyqb/chapter-wise");
   const data = response.data.data;
 
-  const examComponent = data.items.find(
-    (item: any) => item.componentTitle === "ChapterwiseExams"
+  const exams: ExamItem[] = data.flatMap((stream: any) =>
+    stream.streams.flatMap((streamItem: any) =>
+      streamItem.exams.map((exam: any) => ({
+        title: exam.title,
+        examId: exam._id,
+        tagline:
+          `${exam.keyPointsMeta[0]?.description} • ${exam.keyPointsMeta[2]?.description} Questions` ||
+          "",
+      }))
+    )
   );
-
-  const exams: ExamItem[] = examComponent.items.map((item: any) => ({
-    title: item.title,
-    examId: item.examId,
-  }));
 
   return exams;
 };
@@ -30,5 +35,5 @@ export const getExamSubjects = async (id: string) => {
     })
   );
 
-  return subjects;
+  return { title: response.data.data.title, subjects };
 };

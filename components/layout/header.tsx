@@ -11,7 +11,7 @@ export default function QuestionHeader({
 }: QuestionHeaderProps) {
   return (
     <div className="mb-4">
-      <div className="flex text-xs text-gray-500 mb-4 select-none">
+      <div className="flex text-sm text-gray-500 mb-4 select-none">
         <span>
           {title} • Question {currentQuestionNumber} of {totalQuestions}
         </span>
