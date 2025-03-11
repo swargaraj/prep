@@ -8,13 +8,11 @@ import LoadingDots from "./dots";
 import { useQuestionData } from "@/hooks/useQuestionData";
 
 interface QuestionContainerProps {
-  exam: string;
   chapter: string;
   question: string;
 }
 
 export default function QuestionContainer({
-  exam,
   chapter,
   question: currentQuestionId,
 }: QuestionContainerProps) {
@@ -31,9 +29,6 @@ export default function QuestionContainer({
     handleSelectOption,
   } = useQuestionData({ chapter, questionId: currentQuestionId });
 
-  const loadedQuestions = questionList
-    .map((q) => questionsData[q])
-    .filter((q): q is any => !!q);
   const currentDetailedQuestion = questionsData[questionList[currentIndex]];
 
   if (error) {
@@ -41,16 +36,17 @@ export default function QuestionContainer({
   }
   if (loadingQuestion || !currentDetailedQuestion) {
     return (
-      <div className="text-center">
-        Loading question <LoadingDots />
-      </div>
+      <p className="text-gray-500">
+        Loading Question <LoadingDots />
+      </p>
     );
   }
 
   return (
     <div className="w-[90%] md:w-[70%] mx-auto">
       <QuestionHeader
-        title={currentDetailedQuestion.previousYearPapers[0].title}
+        title={currentDetailedQuestion.yearsAppeared}
+        chapter={chapter}
         currentQuestionNumber={currentIndex + 1}
         totalQuestions={questionList.length}
       />

@@ -9,16 +9,16 @@ interface ExamPageClientProps {
   exams: ExamItem[];
 }
 
-export function ExamsPage({ exams }: ExamPageClientProps) {
+export function ExamPage({ exams }: ExamPageClientProps) {
   return (
-    <div className="min-h-screen md:py-20 py-10 flex flex-col items-center justify-center p-4">
-      <div className="w-full max-w-3xl grid gap-4">
+    <div className="min-h-screen md:py-20 py-6 flex flex-col items-center justify-center p-4">
+      <div className="md:w-[80%] w-[95%]">
         <h2 className="text-lg font-mono text-gray-400 mb-4">Select Exam</h2>
         <div className="grid gap-3">
-          {exams.map((exam) => (
+          {exams.map((exam, index) => (
             <Link
-              key={exam.examId}
-              href={`/${exam.examId}`}
+              key={index}
+              href={`/exam/${exam.examId}`}
               className="hover:bg-muted-foreground/5 hover:border-gray-700 cursor-pointer p-4 border border-input bg-background shadow-xs"
             >
               <div className="font-mono text-lg text-gray-200">

@@ -6,12 +6,16 @@ import { ChapterQuestionItem, QuestionItem } from "@/lib/types";
 export const getChapterDetails = async (
   id: string,
   syllabusCategory: string = "asPerSyllabus"
-): Promise<string[]> => {
+) => {
   const response = await client.get(
     `/v3/cpyqb/chapters/${id}/details/dynamic?syllabusCategory=${syllabusCategory}`
   );
 
-  return response.data.data.questions.slice().reverse();
+  return {
+    title: response.data.data.chapterId.title,
+    subject: response.data.data.cpyqbSubject.id,
+    questions: response.data.data.questions.slice().reverse(),
+  };
 };
 
 export const getChapterQuestions = async (
@@ -27,9 +31,8 @@ export const getChapterQuestions = async (
     (question: any) => ({
       id: question._id,
       title: question.title.text,
-      image: question.title.image,
       questionType: question.questionType,
-      yearsAppeared: question.yearsAppeared,
+      yearsAppeared: question.yearsAppeared[0].title,
     })
   );
 
@@ -46,10 +49,10 @@ export const getQuestion = async (id: string) => {
     image: question.question.image,
     options: question.options,
     approximateTimeRequired: question.approximateTimeRequired,
-    previousYearPapers: question.previousYearPapers,
     correctValue: question.correctValue,
     solution: question.solution,
     answer: question.answer,
+    yearsAppeared: question.previousYearPapers[0].title,
     numericalUpperLimit: question.numericalUpperLimit,
     numericalLowerLimit: question.numericalLowerLimit,
   };

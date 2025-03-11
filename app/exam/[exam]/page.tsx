@@ -1,9 +1,17 @@
 "use cache";
 
-import { getExamSubjects } from "@/services/exams";
-import { notFound } from "next/navigation";
-import { SubjectPage, SubjectLoading } from "./subjects";
+import type { Metadata } from "next";
+
 import { Suspense } from "react";
+import { notFound } from "next/navigation";
+import { getExamSubjects } from "@/services/exams";
+import { SubjectPage, SubjectLoading } from "./subjects";
+
+export async function generateMetadata(): Promise<Metadata> {
+  return {
+    title: "Loading • swrg.dev",
+  };
+}
 
 async function fetchSubjects(examId: string) {
   try {
@@ -26,7 +34,7 @@ async function SubjectClient({ exam }: { exam: string }) {
   return <SubjectPage subjects={subjects} />;
 }
 
-export default async function Page({
+export default async function SubjectsPage({
   params,
 }: {
   params: Promise<{ exam: string }>;

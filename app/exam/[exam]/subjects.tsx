@@ -1,8 +1,9 @@
 "use client";
 
-import LoadingDots from "@/components/layout/dots";
-import { ExamSubjectItem } from "@/lib/types";
 import Link from "next/link";
+import { useEffect } from "react";
+import { ExamSubjectItem } from "@/lib/types";
+import LoadingDots from "@/components/layout/dots";
 
 interface Props {
   subjects: {
@@ -12,9 +13,13 @@ interface Props {
 }
 
 export function SubjectPage({ subjects }: Props) {
+  useEffect(() => {
+    document.title = `${subjects.title} • swrg.dev`;
+  }, [subjects.title]);
+
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-4">
-      <div className="w-full max-w-3xl">
+    <div className="min-h-screen md:py-20 py-6 flex flex-col items-center justify-center p-4">
+      <div className="md:w-[80%] w-[95%]">
         <Link
           href="/"
           className="text-gray-500 hover:text-gray-300 mb-8 inline-block"
@@ -33,10 +38,10 @@ export function SubjectPage({ subjects }: Props) {
 
           <div className="grid gap-3">
             {subjects.subjects.length > 0 ? (
-              subjects.subjects.map((subject) => (
+              subjects.subjects.map((subject, index) => (
                 <Link
-                  key={subject.id}
-                  href={`/${subjects.title}/${subject.id}`}
+                  key={index}
+                  href={`/subject/${subject.id}`}
                   className="hover:bg-muted-foreground/5 hover:border-gray-700 cursor-pointer p-4 border border-input bg-background shadow-xs"
                 >
                   <div className="font-mono text-lg text-gray-200">

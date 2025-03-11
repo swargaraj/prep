@@ -8,7 +8,6 @@ export interface ExamSubjectItem {
   id: string;
   title: string;
   chapters: string[];
-  icon: string;
   questionsCount: number;
   chaptersCount: number;
 }
@@ -17,10 +16,7 @@ export interface ChapterItem {
   id: string;
   title: string;
   importance: string;
-  questions: string[];
-  class: string;
   questionsCount: number;
-  icon: string;
 }
 
 export enum QuestionType {
@@ -34,11 +30,7 @@ export interface ChapterQuestionItem {
   title: string;
   image: string | null;
   questionType: QuestionType;
-  yearsAppeared: {
-    _id: string;
-    title: string;
-    heldOn: string;
-  }[];
+  yearsAppeared: string;
 }
 
 export interface QuestionItem {
@@ -46,7 +38,6 @@ export interface QuestionItem {
   id: string;
   title: string;
   image: string | null;
-  previousYearPapers: { title: string }[];
   approximateTimeRequired: number;
   options: {
     id: string;
@@ -54,6 +45,7 @@ export interface QuestionItem {
     isCorrect: boolean;
     image: string | null;
   }[];
+  yearsAppeared: string;
   correctValue: string | null;
   solution: { text: string; image: string | null };
   numericalUpperLimit: number | null;

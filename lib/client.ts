@@ -20,11 +20,11 @@ client.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response && error.response.status >= 500) {
-      console.warn("Server error, returning fallback response.");
+      console.error("API Request Failed");
       return {
         data: null,
         status: error.response.status,
-        error: "API error occurred",
+        error: "API Request Failed",
       };
     }
     return Promise.reject(error);

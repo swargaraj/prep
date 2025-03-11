@@ -1,6 +1,6 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
-import { QuestionItem } from "@/lib/types";
+import { QuestionItem, QuestionType } from "@/lib/types";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -13,3 +13,9 @@ export function isOptionCorrect(
   if (selected === null) return false;
   return question.options.some((opt) => opt.text === selected && opt.isCorrect);
 }
+
+export const formatQuestionType = (type: QuestionType) => {
+  return type
+    .replace(/([A-Z])/g, " $1")
+    .replace(/^./, (str) => str.toUpperCase());
+};

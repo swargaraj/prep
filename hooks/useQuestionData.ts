@@ -81,8 +81,10 @@ export function useQuestionData({
           ...prev,
           [currentDetail.id]: currentDetail,
         }));
-        setQuestionList(chapterQs);
-        const idx = chapterQs.findIndex((q) => q === currentDetail.id);
+        setQuestionList(chapterQs.questions);
+        const idx = chapterQs.questions.findIndex(
+          (q: string) => q === currentDetail.id
+        );
         const newIndex = idx >= 0 ? idx : 0;
         setCurrentIndex(newIndex);
         dispatch({
@@ -91,7 +93,7 @@ export function useQuestionData({
         });
         dispatch({
           type: "resetSelectedOptions",
-          payload: { length: chapterQs.length },
+          payload: { length: chapterQs.questions.length },
         });
         hasInitialized.current = true;
       } catch (err) {
@@ -135,8 +137,8 @@ export function useQuestionData({
   useEffect(() => {
     if (!questionList.length) return;
 
-    const preloadStart = Math.max(0, currentIndex - 3);
-    const preloadEnd = Math.min(questionList.length - 1, currentIndex + 5);
+    const preloadStart = Math.max(0, currentIndex - 1);
+    const preloadEnd = Math.min(questionList.length - 1, currentIndex + 1);
 
     for (let i = preloadStart; i <= preloadEnd; i++) {
       const qId = questionList[i];
